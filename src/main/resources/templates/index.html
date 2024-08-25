@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Aryan_Agarwal_21BCT0091</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <h1>BFHL API Tester</h1>
+    <textarea id="jsonInput" rows="10" cols="50" placeholder='Enter JSON here'></textarea><br>
+    <button onclick="submitData()">Submit</button>
+
+    <br><br>
+    <label for="filters">Choose filters:</label>
+    <select id="filters" multiple>
+        <option value="alphabets">Alphabets</option>
+        <option value="numbers">Numbers</option>
+        <option value="highest_lowercase_alphabet">Highest Lowercase Alphabet</option>
+    </select>
+
+    <pre id="response"></pre>
+
+    <script>
+        function submitData() {
+            const jsonInput = document.getElementById("jsonInput").value;
+            try {
+                const jsonData = JSON.parse(jsonInput);
+
+                fetch('/bfhl', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(jsonData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    let filters = Array.from(document.getElementById("filters").selectedOptions).map(option => option.value);
+
+                    // If no filters are selected, display the entire response
+                    if (filters.length === 0) {
+                        document.getElementById("response").innerText = JSON.stringify(data, null, 2);
+                    } else {
+                        let filteredData = {};
+                        filters.forEach(filter => {
+                            if (data[filter]) {
+                                filteredData[filter] = data[filter];
+                            }
+                        });
+                        document.getElementById("response").innerText = JSON.stringify(filteredData, null, 2);
+                    }
+                });
+            } catch (e) {
+                alert("Invalid JSON input");
+            }
+        }
+    </script>
+</body>
+</html>
